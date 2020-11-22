@@ -30,12 +30,13 @@ hunter_add_package(nlohmann_json)
 find_package(nlohmann_json CONFIG REQUIRED)
 
 add_library(lab-01-parser STATIC
-        # enum your files and delete this comment
-        ${CMAKE_CURRENT_SOURCE_DIR}/sources/source.cpp
-        sources/Student.cpp include/Student.h sources/jsonparser.cpp include/jsonparser.h)
+        ${CMAKE_CURRENT_SOURCE_DIR}/sources/jsonparser.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sources/Student.cpp
+        )
 
 add_executable(tests
-        ${CMAKE_CURRENT_SOURCE_DIR}/tests/test.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/jsonparser_test.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/Student_test.cpp
         )
 
 target_include_directories(lab-01-parser
