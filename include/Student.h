@@ -1,23 +1,33 @@
-//
-// Created by ivan on 22.11.2020.
-//
+#ifndef INCLUDE_HEADER_HPP_
+#define INCLUDE_HEADER_HPP_
 
-#ifndef LAB_01_PARSER_STUDENT_H
-#define LAB_01_PARSER_STUDENT_H
-#pragma once
 #include <any>
-#include <string>
-#include <iostream>
 #include <nlohmann/json.hpp>
-#include <iomanip>
-#include <fstream>
-#include <sstream>
+#include <ostream>
+#include <string>
+#include <vector>
 
-struct Students {
-  std::string Name;
-  std::any Group;
-  std::any Avg;
-  std::any Debt;
+using nlohmann::json;
+
+struct Student {
+  explicit Student(const json &j); //конструктор- метод проводящий стартовую инициализацию
+  std::string name;
+  std::any group;
+  std::any avg;
+  std::any debt;
 };
 
-#endif  // LAB_01_PARSER_STUDENT_H
+std::vector<Student> LoadFromFile(const std::string &filepath); //из файла функция читает файл джисон и формирует структуру студентов
+
+
+
+void PrintTable(const std::vector<Student> &students, std::ostream &out);
+
+//оборачив в себя некрасив функции джейсона чтобы не писать лишний код, код красивее становится
+//статик если функцию объявили где то, то при лок связывании (include) эту функцию не можем больше нигде использовать, только тут и в source
+std::string getName(const json &j); //из объекта джейсона должна вернуть строкй с именем
+std::any getGroup(const json &j);
+std::any getAvg(const json &j);
+std::any getDebt(const json &j);
+
+#endif  // INCLUDE_HEADER_HPP_
