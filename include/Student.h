@@ -11,15 +11,19 @@ using nlohmann::json;
 
 struct Student {
   explicit Student(const json &j); //конструктор- метод проводящий стартовую инициализацию
+//метод вызываемый содержимое
+  void PrintName(std::ostream &out) const; //аут поток вывода которым выводим наш элемент
+  void PrintGroup(std::ostream &out) const; //const значит что метод не изменяет содержимое структуры и никак на данные не влияет
+  void PrintAvg(std::ostream &out) const;
+  void PrintDebt(std::ostream &out) const;
+
   std::string name;
   std::any group;
   std::any avg;
   std::any debt;
 };
 
-std::vector<Student> LoadFromFile(const std::string &filepath); //из файла функция читает файл джисон и формирует структуру студентов
-
-
+std::vector<Student> LoadFromFile(const std::string &filepath); //из файла функция читает файл джисон и формирует массив структур студентов
 
 void PrintTable(const std::vector<Student> &students, std::ostream &out);
 
