@@ -31,7 +31,7 @@ find_package(nlohmann_json CONFIG REQUIRED)
 
 add_library(lab-01-parser STATIC
         ${CMAKE_CURRENT_SOURCE_DIR}/sources/Student.cpp
-        include/json_any_serializer.h)
+        )
 
 add_executable(tests
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/test.cpp

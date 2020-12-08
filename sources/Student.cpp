@@ -120,3 +120,78 @@ void Student::PrintGroup(std::ostream &out) const {
     out << std::any_cast<std::string>(group);
   }
 }
+______________
+#include <fstream>
+#include <header.hpp>
+#include <iomanip>
+#include <nlohmann/json.hpp>
+#include <sstream>
+#include <stdexcept>
+
+using nlohmann::json;
+//get функции
+std::string get_name(const json &j) { return j.get<std::string>(); }
+
+std::any get_group(const json &j) { //гет групп проверяет какой тип хранится в джейсоне смотрит какой тип и исходя из типа в джейсоне записывает в эни
+  if (j.is_string())
+    return j.get<std::string>();
+  else
+    return j.get<int>();
+}
+
+std::any get_avg(const json &j) {
+  if (j.is_null()) {
+    return nullptr;
+  } else if (j.is_string()) {
+    return j.get<std::string>();
+  } else if (j.is_number_float()) {
+    return j.get<float>();
+  } else {
+    return j.get<int>();
+  }
+}
+
+std::any get_debt(const json &j) {
+  if (j.is_null()) {
+    return nullptr;  //нулптр это ключевое слово, а NULL это макрос
+  } else if (j.is_string()) {
+    return j.get<std::string>();
+  } else {
+    return j.get<std::vector<std::string>>();
+  }
+}
+
+void from_json(const json &j, student_t &s) {
+  s.name = get_name(j.at("group"));
+  s.group = get_group(j.at("group"));
+  s.avg = get_avg(j.at("avg"));
+  s.debt = get_debt(j.at("debt"));
+}
+
+std::vector<student_t> parse_file(const std::string &filepath) { //то же самое что и лоад фром файл
+  std::fstream file;
+  file.open(filepath, std::ios::in);
+  if (!file.is_open()) {
+    throw std::runtime_error(filepath + " not open");
+  }
+
+  json j;
+  file >> j;
+  file.close();
+
+  if (!j.at("items").is_array()) {
+    throw std::runtime_error("Items most be array type");
+  }
+
+  if (j.at("items").size() != j.at("_meta").at("count")) {
+    throw std::runtime_error("meta_: count and items size mismatch");
+  }
+
+  std::vector<student_t> result;
+
+  for (std::size_t i = 0; i < j.at("items").size(); i++) {
+    auto student = j.at("items")[i].get<student_t>(); //воид джейсон является сиреализатором, авто автоматический вывод типов, компилятор сам заменяет на нужный тип
+    result.push_back(student);
+  }
+  return result;
+}
