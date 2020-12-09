@@ -2,29 +2,33 @@
 // Created by ivan on 22.11.2020.
 //
 
-#include "Student.h"
+#include <fstream>
+#include <Student.h>
+#include <iomanip>
+#include <nlohmann/json.hpp>
+#include <sstream>
+#include <stdexcept>
 
-#include "fstream"
-
+using nlohmann::json;
 //мы не знаем, что предствялет собой джейсон
 
 //все гет функции оборачив в себя некрасив функции джейсона чтобы не писать
 //лишний код, код красивее становится гет функции из джейсона преобразуют в
 //объект эни
-std::string getName(const json &j) {
-  return j.get<std::string>();
-}  //знаем что название-строка и преобр в строку
+std::string get_Name(const json &j) { return j.get<std::string>(); }
+ //знаем что название-строка и преобр в строку
 
-std::any getGroup(
-    const json &j) {  //не знаем чем является джейсон поэтому достаем либо число
-                      //либо строку и отдаем эни
+
+//не знаем чем является джейсон поэтому достаем либо число
+//либо строку и отдаем эни
+std::any get_group(const json &j) { //гет групп проверяет какой тип хранится в джейсоне смотрит какой тип и исходя из типа в джейсоне записывает в эни
   if (j.is_string())
     return j.get<std::string>();
   else
     return j.get<int>();
 }
 
-std::any getAvg(const json &j) {
+std::any get_avg(const json &j) {
   if (j.is_null()) {
     return nullptr;
   } else if (j.is_string()) {
@@ -36,15 +40,18 @@ std::any getAvg(const json &j) {
   }
 }
 
-std::any getDebt(const json &j) {
+std::any get_debt(const json &j) {
   if (j.is_null()) {
-    return nullptr;
+    return nullptr;  //нулптр это ключевое слово, а NULL это макрос
   } else if (j.is_string()) {
     return j.get<std::string>();
   } else {
     return j.get<std::vector<std::string>>();
   }
 }
+
+
+
 std::vector<Student> LoadFromFile(const std::string &filepath) {
   std::fstream file;  // fstream инпут файл стрим, создаем объект ст потока
   file.open(filepath, std::ios::in);  //отркываем файл по пути файлпас, с флагом
@@ -121,45 +128,15 @@ void Student::PrintGroup(std::ostream &out) const {
   }
 }
 ______________
-#include <fstream>
-#include <header.hpp>
-#include <iomanip>
-#include <nlohmann/json.hpp>
-#include <sstream>
-#include <stdexcept>
 
-using nlohmann::json;
+
+
 //get функции
-std::string get_name(const json &j) { return j.get<std::string>(); }
 
-std::any get_group(const json &j) { //гет групп проверяет какой тип хранится в джейсоне смотрит какой тип и исходя из типа в джейсоне записывает в эни
-  if (j.is_string())
-    return j.get<std::string>();
-  else
-    return j.get<int>();
-}
 
-std::any get_avg(const json &j) {
-  if (j.is_null()) {
-    return nullptr;
-  } else if (j.is_string()) {
-    return j.get<std::string>();
-  } else if (j.is_number_float()) {
-    return j.get<float>();
-  } else {
-    return j.get<int>();
-  }
-}
 
-std::any get_debt(const json &j) {
-  if (j.is_null()) {
-    return nullptr;  //нулптр это ключевое слово, а NULL это макрос
-  } else if (j.is_string()) {
-    return j.get<std::string>();
-  } else {
-    return j.get<std::vector<std::string>>();
-  }
-}
+
+
 
 void from_json(const json &j, student_t &s) {
   s.name = get_name(j.at("group"));
