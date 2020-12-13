@@ -41,7 +41,7 @@ TEST(PrintTable, PrintTable) {
   file << json_string;
   file.close();
 
-  auto students = parse_file("test.json");
+  auto students = parse_file("file.json");
   print(students, std::cout);
   EXPECT_TRUE(true);
 }
