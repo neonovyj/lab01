@@ -50,40 +50,45 @@ std::any get_debt(const json &j) {
   }
 }
 
+void from_json(const json &j, student_t &s) {
+  s.name = get_name(j.at("group"));
+  s.group = get_group(j.at("group"));
+  s.avg = get_avg(j.at("avg"));
+  s.debt = get_debt(j.at("debt"));
+}
 
+std::vector<student_t> parse_file(const std::string &filepath) { //то же самое что и лоад фром файл
+  std::fstream file;
+  file.open(filepath, std::ios::in);
+  if (!file.is_open()) {  //тру еси файл отрклся, фолс если не отркылся
+    throw std::runtime_error(filepath + " not open"); //запускаем исключение
+  }//программа остановится, передаст исключение назад по
+  //функциям, если никто не обрабатывает, то исключение
+  //остановит программу
 
-std::vector<Student> LoadFromFile(const std::string &filepath) {
-  std::fstream file;  // fstream инпут файл стрим, создаем объект ст потока
-  file.open(filepath, std::ios::in);  //отркываем файл по пути файлпас, с флагом
-                                      //иос ин, который гооврит
-  if (!file.is_open())  //тру еси файл отрклся, фолс если не отркылся и
-                        //запускаем исключение
-    throw std::runtime_error(
-        filepath +
-        "not open");  //программа остановится, передаст исключение назад по
-                      //функциям, если никто не обрабатывает, то исключение
-                      //остановит программу
   json j;
   file >> j;
   file.close();
-
-  std::vector<Student> result;
 
   if (!j.at("items").is_array()) {
     throw std::runtime_error("Items most be array type");
   }
 
-  if (j.at("items").size() != j.at("_meta").at("count")) { //мы сравниваем значение массива с ключом каунт из меты
-    throw std::runtime_error("meta_: count and items size mismatch"); //перефразировать
+  if (j.at("items").size() != j.at("_meta").at("count")) {  //мы сравниваем значение массива с ключом каунт из меты
+    throw std::runtime_error("meta_: count and items size mismatch");//перефразировать
   }
 
-  for (std::size_t i = 0; i < j.at("items").size(); i++) {//std::size_t макрос который принято использовать для обозначения размера. Возвращает размер этого массива.
-    Student student(j.at("items")[i]);//создаем студента из массива
-    result.push_back(student);//студента, кот создали запихиваем в вектор, который мы должны получить. Добавляем элемент, чтобы Сделать массив структур студента
-  }
+  std::vector<student_t> result;
 
+  for (std::size_t i = 0; i < j.at("items").size(); i++) { //std::size_t макрос который принято использовать для обозначения размера. Возвращает размер этого массива.
+    auto student = j.at("items")[i].get<student_t>(); //создаем студента из массива. воид джейсон является сиреализатором, авто автоматический вывод типов, компилятор сам заменяет на нужный тип
+    result.push_back(student); //студента, кот создали запихиваем в вектор, который мы должны получить. Добавляем элемент, чтобы Сделать массив структур студента
+  }
   return result;
 }
+______
+
+
 //по ключу мы получаем значение из джейсона
 // возращает гет нейм переводит из джейсона в строку, метод at- обращение по
 // ключу
@@ -127,48 +132,16 @@ void Student::PrintGroup(std::ostream &out) const {
     out << std::any_cast<std::string>(group);
   }
 }
-______________
-
-
-
-//get функции
 
 
 
 
 
 
-void from_json(const json &j, student_t &s) {
-  s.name = get_name(j.at("group"));
-  s.group = get_group(j.at("group"));
-  s.avg = get_avg(j.at("avg"));
-  s.debt = get_debt(j.at("debt"));
-}
 
-std::vector<student_t> parse_file(const std::string &filepath) { //то же самое что и лоад фром файл
-  std::fstream file;
-  file.open(filepath, std::ios::in);
-  if (!file.is_open()) {
-    throw std::runtime_error(filepath + " not open");
-  }
 
-  json j;
-  file >> j;
-  file.close();
 
-  if (!j.at("items").is_array()) {
-    throw std::runtime_error("Items most be array type");
-  }
 
-  if (j.at("items").size() != j.at("_meta").at("count")) {
-    throw std::runtime_error("meta_: count and items size mismatch");
-  }
 
-  std::vector<student_t> result;
 
-  for (std::size_t i = 0; i < j.at("items").size(); i++) {
-    auto student = j.at("items")[i].get<student_t>(); //воид джейсон является сиреализатором, авто автоматический вывод типов, компилятор сам заменяет на нужный тип
-    result.push_back(student);
-  }
-  return result;
-}
+
