@@ -1,5 +1,6 @@
-#ifndef INCLUDE_HEADER_HPP_
-#define INCLUDE_HEADER_HPP_
+// Copyright 2020 ivan <ikhonyak@gmail.com>
+#ifndef INCLUDE_STUDENT_H_
+#define INCLUDE_STUDENT_H_
 
 #include <any>
 #include <nlohmann/json.hpp>
@@ -19,4 +20,4 @@ void print(const student_t &student, std::ostream &os);
 void print(const std::vector<student_t> &students, std::ostream &os);
 std::vector<student_t> parse_file(const std::string &filepath);
 
-#endif  // INCLUDE_HEADER_HPP_
+#endif  // INCLUDE_STUDENT_H_
