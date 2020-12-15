@@ -7,11 +7,6 @@
 #include <sstream>
 #include <stdexcept>
 
-using nlohmann::json;
-const int name_tablewidth = 15;
-const int group_tablewidth = 9;
-const int avg_tablewidth = 5;
-const int debt_tablewidth = 8;
 //мы не знаем, что предствялет собой джейсон
 
 //все гет функции оборачив в себя некрасив функции джейсона чтобы не писать
@@ -53,8 +48,7 @@ std::any get_debt(const json &j) {
   }
 }
 
-void from_json(const json &j,
-               student_t &s) {  //иницализирует структуру из джейсона
+void from_json(const json &j,student_t &s) {  //иницализирует структуру из джейсона
   s.name = get_Name(j.at("name"));  //оператор at - обращение по ключу
   s.group = get_group(j.at("group"));
   s.avg = get_avg(j.at("avg"));
@@ -105,6 +99,12 @@ std::vector<student_t> parse_file(const std::string &filepath) {
 }
 
 void print(const student_t &student, std::ostream &os) {
+  //тут используются манипуляторы - специальные классы,
+                                  //которые передаваясь в стандартные потоки вывода
+                                            //изменяют его поведение
+  //left - выводимое поле выравниваем по левому краю
+  //setw - задает ширину поля.
+  // Если поле не занимает ширину полностью, то заполнит пробелами
   os << "| " << std::left << std::setw(name_tablewidth) << student.name;
 
   if (student.group.type() == typeid(int)) {
@@ -139,7 +139,7 @@ void print(const student_t &student, std::ostream &os) {
   }
 }
 
-std::string create_separator(const std::vector<int> &column_widths) {
+std::string do_line(const std::vector<int> &column_widths) {
   std::string result;
   for (const auto &width : column_widths) {
     result += "|-";
@@ -152,21 +152,22 @@ std::string create_separator(const std::vector<int> &column_widths) {
 }
 
 void print(const std::vector<student_t> &students, std::ostream &os) {
-  std::string separator;
+  std::string line; //перегруженная функция для массива студентов
 
   std::vector<int> widths{name_tablewidth, group_tablewidth, avg_tablewidth,
                           debt_tablewidth};
 
-  separator = create_separator(widths);
-
+  line = do_line(widths);
+//выводим заголовок таблички
   os << "| " << std::left << std::setw(name_tablewidth) << "name";
   os << "| " << std::left << std::setw(group_tablewidth) << "group";
   os << "| " << std::left << std::setw(avg_tablewidth) << "avg";
   os << "| " << std::left << std::setw(debt_tablewidth) << "debt";
   os << std::right << "|";
-  os << std::endl << separator << std::endl;
+  os << std::endl << line << std::endl;
+  //последовательно вызываем функцию для одного студента
   for (const auto &student : students) {
     print(student, os);
-    os << std::endl << separator << std::endl;
+    os << std::endl << line << std::endl;
   }
 }
