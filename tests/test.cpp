@@ -53,8 +53,7 @@ TEST(Errors, NonExistingFile) {
   } catch (std::runtime_error &e) {
     exception_string = e.what();
   }
-  // todo тут поменять на свою строку [не забудь удалить коммент]
-  EXPECT_EQ(exception_string, "non/existing/file.json not open");
+  EXPECT_EQ(exception_string, "non/existing/file.json unable to open json");
 }
 
 TEST(Errors, ItemsIsNotArray) {
@@ -127,5 +126,5 @@ TEST(Errors, IncorrectMeta) {
   } catch (std::runtime_error &e) {
     exception_string = e.what();
   }
-  EXPECT_EQ(exception_string, "meta_: count and items size mismatch");
+  EXPECT_EQ(exception_string, "meta_: error with count");
 }

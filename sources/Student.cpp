@@ -8,6 +8,10 @@
 #include <stdexcept>
 
 using nlohmann::json;
+const int name_tablewidth = 15;
+const int group_tablewidth = 8;
+const int avg_tablewidth = 5;
+const int debt_tablewidth = 8;
 //мы не знаем, что предствялет собой джейсон
 
 //все гет функции оборачив в себя некрасив функции джейсона чтобы не писать
@@ -49,20 +53,20 @@ std::any get_debt(const json &j) {
   }
 }
 
-void from_json(const json &j, student_t &s) {
-  s.name = get_Name(j.at("name"));
+void from_json(const json &j, student_t &s) {  //иницализирует структуру из джейсона
+  s.name = get_Name(j.at("name"));  //оператор at - обращение по ключу
   s.group = get_group(j.at("group"));
   s.avg = get_avg(j.at("avg"));
   s.debt = get_debt(j.at("debt"));
 }
 
-std::vector<student_t> parse_file(
-    const std::string &filepath) {  //то же самое что и лоад фром файл
-  std::fstream file;
+std::vector<student_t> parse_file(const std::string &filepath) {
+  std::fstream file;  //чтение файла
   file.open(filepath, std::ios::in);
   if (!file.is_open()) {  //тру еси файл отрклся, фолс если не отркылся
-    throw std::runtime_error(filepath + " not open");  //запускаем исключение
-  }  //программа остановится, передаст исключение назад по
+    throw std::runtime_error(filepath +" unable to open json");  //запускаем исключение
+  }  //программа остановится, если сработало исключение передаст исключение
+     //назад по
   //функциям, если никто не обрабатывает, то исключение
   //остановит программу
 
@@ -70,15 +74,15 @@ std::vector<student_t> parse_file(
   file >> j;
   file.close();
 
-  if (!j.at("items").is_array()) {
+  if (!j.at("items").is_array()) {  // виды исключений: logic_error
+                                    // runtime_error invalid_argument
     throw std::runtime_error("Items most be array type");
   }
 
   if (j.at("items").size() !=
       j.at("_meta").at(
           "count")) {  //мы сравниваем значение массива с ключом каунт из меты
-    throw std::runtime_error(
-        "meta_: count and items size mismatch");  //перефразировать
+    throw std::runtime_error("meta_: error with count");
   }
 
   std::vector<student_t> result;
@@ -99,43 +103,36 @@ std::vector<student_t> parse_file(
   return result;
 }
 
-//заменить цифры на константы
-// name_column_width = 14
-const int name_column_width = 14;
-const int group_column_width = 10;
-const int avg_column_width = 5;
-const int debt_column_width = 10;
-
 void print(const student_t &student, std::ostream &os) {
-  os << "| " << std::left << std::setw(name_column_width) << student.name;
+  os << "| " << std::left << std::setw(name_tablewidth) << student.name;
 
   if (student.group.type() == typeid(int)) {
-    os << "| " << std::setw(group_column_width) << std::left
+    os << "| " << std::setw(group_tablewidth) << std::left
        << std::any_cast<int>(student.group);
   } else {
-    os << "| " << std::setw(group_column_width) << std::left
+    os << "| " << std::setw(group_tablewidth) << std::left
        << std::any_cast<std::string>(student.group);
   }
 
   if (student.avg.type() == typeid(float)) {
-    os << "| " << std::setw(avg_column_width) << std::left
+    os << "| " << std::setw(avg_tablewidth) << std::left
        << std::any_cast<float>(student.avg);
   } else if (student.avg.type() == typeid(int)) {
-    os << "| " << std::setw(avg_column_width) << std::left
+    os << "| " << std::setw(avg_tablewidth) << std::left
        << std::any_cast<int>(student.avg);
   } else {
-    os << "| " << std::setw(avg_column_width) << std::left
+    os << "| " << std::setw(avg_tablewidth) << std::left
        << std::any_cast<std::string>(student.avg);
   }
 
   if (student.debt.type() == typeid(std::nullptr_t)) {
-    os << "| " << std::setw(debt_column_width) << std::left << "null"
+    os << "| " << std::setw(debt_tablewidth) << std::left << "null"
        << std::right << "|";
   } else if (student.debt.type() == typeid(std::string)) {
-    os << "| " << std::setw(debt_column_width) << std::left
+    os << "| " << std::setw(debt_tablewidth) << std::left
        << std::any_cast<std::string>(student.debt) << std::right << "|";
   } else {
-    os << "| " << std::setw(debt_column_width - 5) << std::left
+    os << "| " << std::setw(debt_tablewidth - 5) << std::left
        << std::any_cast<std::vector<std::string>>(student.debt).size()
        << std::left << std::setw(5) << "items" << std::right << "|";
   }
@@ -156,15 +153,15 @@ std::string create_separator(const std::vector<int> &column_widths) {
 void print(const std::vector<student_t> &students, std::ostream &os) {
   std::string separator;
 
-  std::vector<int> widths{name_column_width, group_column_width,
-                          avg_column_width, debt_column_width};
+  std::vector<int> widths{name_tablewidth, group_tablewidth,
+                          avg_tablewidth, debt_tablewidth};
 
   separator = create_separator(widths);
 
-  os << "| " << std::left << std::setw(name_column_width) << "name";
-  os << "| " << std::left << std::setw(group_column_width) << "group";
-  os << "| " << std::left << std::setw(avg_column_width) << "avg";
-  os << "| " << std::left << std::setw(debt_column_width) << "debt";
+  os << "| " << std::left << std::setw(name_tablewidth) << "name";
+  os << "| " << std::left << std::setw(group_tablewidth) << "group";
+  os << "| " << std::left << std::setw(avg_tablewidth) << "avg";
+  os << "| " << std::left << std::setw(debt_tablewidth) << "debt";
   os << std::right << "|";
   os << std::endl << separator << std::endl;
   for (const auto &student : students) {
