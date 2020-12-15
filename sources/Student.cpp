@@ -32,7 +32,7 @@ std::any get_debt(const json &j) {
   }
 }
 
-void from_json(const json &j,student_t &s) {
+void from_json(const json &j, student_t &s) {
   s.name = get_Name(j.at("name"));
   s.group = get_group(j.at("group"));
   s.avg = get_avg(j.at("avg"));
@@ -43,7 +43,7 @@ std::vector<student_t> parse_file(const std::string &filepath) {
   std::fstream file;
   file.open(filepath, std::ios::in);
   if (!file.is_open()) {
-    throw std::runtime_error(filepath +" unable to open json");
+    throw std::runtime_error(filepath + " unable to open json");
   }
 
   json j;
@@ -54,18 +54,13 @@ std::vector<student_t> parse_file(const std::string &filepath) {
     throw std::runtime_error("Items most be array type");
   }
 
-  if (j.at("items").size() !=
-      j.at("_meta").at(
-          "count")) {
+  if (j.at("items").size() != j.at("_meta").at("count")) {
     throw std::runtime_error("meta_: error with count");
   }
 
   std::vector<student_t> result;
-  for (std::size_t i = 0; i < j.at("items").size();
-       i++) {
-    auto student =
-        j.at("items")[i]
-            .get<student_t>();
+  for (std::size_t i = 0; i < j.at("items").size(); i++) {
+    auto student = j.at("items")[i].get<student_t>();
     result.push_back(student);
   }
   return result;
@@ -130,7 +125,7 @@ void print(const std::vector<student_t> &students, std::ostream &os) {
   os << "| " << std::left << std::setw(debt_tablewidth) << "debt";
   os << std::right << "|";
   os << std::endl << line << std::endl;
-    for (const auto &student : students) {
+  for (const auto &student : students) {
     print(student, os);
     os << std::endl << line << std::endl;
   }
