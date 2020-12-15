@@ -53,7 +53,8 @@ std::any get_debt(const json &j) {
   }
 }
 
-void from_json(const json &j, student_t &s) {  //иницализирует структуру из джейсона
+void from_json(const json &j,
+               student_t &s) {  //иницализирует структуру из джейсона
   s.name = get_Name(j.at("name"));  //оператор at - обращение по ключу
   s.group = get_group(j.at("group"));
   s.avg = get_avg(j.at("avg"));
@@ -64,7 +65,7 @@ std::vector<student_t> parse_file(const std::string &filepath) {
   std::fstream file;  //чтение файла
   file.open(filepath, std::ios::in);
   if (!file.is_open()) {  //тру еси файл отрклся, фолс если не отркылся
-    throw std::runtime_error(filepath +" unable to open json");  //запускаем исключение
+    throw std::runtime_error(filepath +" unable to open json");
   }  //программа остановится, если сработало исключение передаст исключение
      //назад по
   //функциям, если никто не обрабатывает, то исключение
@@ -153,8 +154,8 @@ std::string create_separator(const std::vector<int> &column_widths) {
 void print(const std::vector<student_t> &students, std::ostream &os) {
   std::string separator;
 
-  std::vector<int> widths{name_tablewidth, group_tablewidth,
-                          avg_tablewidth, debt_tablewidth};
+  std::vector<int> widths{name_tablewidth, group_tablewidth, avg_tablewidth,
+                          debt_tablewidth};
 
   separator = create_separator(widths);
 
