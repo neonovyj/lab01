@@ -9,7 +9,7 @@
 
 using nlohmann::json;
 const int name_tablewidth = 15;
-const int group_tablewidth = 8;
+const int group_tablewidth = 9;
 const int avg_tablewidth = 5;
 const int debt_tablewidth = 8;
 //мы не знаем, что предствялет собой джейсон
