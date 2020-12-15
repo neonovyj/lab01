@@ -1,25 +1,9 @@
 // Copyright 2020 ivan <ikhonyak@gmail.com>
 #include <Student.h>
 
-#include <fstream>
-#include <iomanip>
-#include <nlohmann/json.hpp>
-#include <sstream>
-#include <stdexcept>
-
-//мы не знаем, что предствялет собой джейсон
-
-//все гет функции оборачив в себя некрасив функции джейсона чтобы не писать
-//лишний код, код красивее становится гет функции из джейсона преобразуют в
-//объект эни
 std::string get_Name(const json &j) { return j.get<std::string>(); }
-//знаем что название-строка и преобр в строку
 
-//не знаем чем является джейсон поэтому достаем либо число
-//либо строку и отдаем эни
-std::any get_group(const json &j) {  //гет групп проверяет какой тип хранится в
-                                     //джейсоне смотрит какой тип и исходя из
-                                     //типа в джейсоне записывает в эни
+std::any get_group(const json &j) {
   if (j.is_string())
     return j.get<std::string>();
   else
@@ -40,7 +24,7 @@ std::any get_avg(const json &j) {
 
 std::any get_debt(const json &j) {
   if (j.is_null()) {
-    return nullptr;  //нулптр это ключевое слово, а NULL это макрос
+    return nullptr;
   } else if (j.is_string()) {
     return j.get<std::string>();
   } else {
@@ -48,63 +32,46 @@ std::any get_debt(const json &j) {
   }
 }
 
-void from_json(const json &j,student_t &s) {  //иницализирует структуру из джейсона
-  s.name = get_Name(j.at("name"));  //оператор at - обращение по ключу
+void from_json(const json &j,student_t &s) {
+  s.name = get_Name(j.at("name"));
   s.group = get_group(j.at("group"));
   s.avg = get_avg(j.at("avg"));
   s.debt = get_debt(j.at("debt"));
 }
 
 std::vector<student_t> parse_file(const std::string &filepath) {
-  std::fstream file;  //чтение файла
+  std::fstream file;
   file.open(filepath, std::ios::in);
-  if (!file.is_open()) {  //тру еси файл отрклся, фолс если не отркылся
+  if (!file.is_open()) {
     throw std::runtime_error(filepath +" unable to open json");
-  }  //программа остановится, если сработало исключение передаст исключение
-     //назад по
-  //функциям, если никто не обрабатывает, то исключение
-  //остановит программу
+  }
 
   json j;
   file >> j;
   file.close();
 
-  if (!j.at("items").is_array()) {  // виды исключений: logic_error
-                                    // runtime_error invalid_argument
+  if (!j.at("items").is_array()) {
     throw std::runtime_error("Items most be array type");
   }
 
   if (j.at("items").size() !=
       j.at("_meta").at(
-          "count")) {  //мы сравниваем значение массива с ключом каунт из меты
+          "count")) {
     throw std::runtime_error("meta_: error with count");
   }
 
   std::vector<student_t> result;
-
   for (std::size_t i = 0; i < j.at("items").size();
-       i++) {  // std::size_t макрос который принято использовать для
-               // обозначения размера. Возвращает размер этого массива.
+       i++) {
     auto student =
         j.at("items")[i]
-            .get<student_t>();  //создаем студента из массива. воид джейсон
-                                //является сиреализатором, авто автоматический
-                                //вывод типов, компилятор сам заменяет на нужный
-                                //тип
-    result.push_back(student);  //студента, кот создали запихиваем в вектор,
-                                //который мы должны получить. Добавляем элемент,
-                                //чтобы Сделать массив структур студента
+            .get<student_t>();
+    result.push_back(student);
   }
   return result;
 }
 
 void print(const student_t &student, std::ostream &os) {
-  //тут используются манипуляторы - специальные классы,
-                                  //которые передаваясь в стандартные потоки вывода
-                                            //изменяют его поведение
-  //left - выводимое поле выравниваем по левому краю
-  //setw - задает ширину поля.
-  // Если поле не занимает ширину полностью, то заполнит пробелами
   os << "| " << std::left << std::setw(name_tablewidth) << student.name;
 
   if (student.group.type() == typeid(int)) {
@@ -152,21 +119,18 @@ std::string do_line(const std::vector<int> &column_widths) {
 }
 
 void print(const std::vector<student_t> &students, std::ostream &os) {
-  std::string line; //перегруженная функция для массива студентов
-
+  std::string line;
   std::vector<int> widths{name_tablewidth, group_tablewidth, avg_tablewidth,
                           debt_tablewidth};
 
   line = do_line(widths);
-//выводим заголовок таблички
   os << "| " << std::left << std::setw(name_tablewidth) << "name";
   os << "| " << std::left << std::setw(group_tablewidth) << "group";
   os << "| " << std::left << std::setw(avg_tablewidth) << "avg";
   os << "| " << std::left << std::setw(debt_tablewidth) << "debt";
   os << std::right << "|";
   os << std::endl << line << std::endl;
-  //последовательно вызываем функцию для одного студента
-  for (const auto &student : students) {
+    for (const auto &student : students) {
     print(student, os);
     os << std::endl << line << std::endl;
   }

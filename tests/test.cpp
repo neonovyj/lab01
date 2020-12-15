@@ -1,9 +1,6 @@
 // Copyright 2020 ivan <ikhonyak@gmail.com>
-
 #include <gtest/gtest.h>
-
 #include "Student.h"
-#include "fstream"  //файловые потоки
 
 TEST(PrintTable, PrintTable) {
   std::fstream file{"file.json", std::ios::out};
