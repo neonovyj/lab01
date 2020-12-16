@@ -50,6 +50,7 @@ std::vector<student_t> parse_file(const std::string &filepath) {
   file >> j;
   file.close();
 
+
   if (!j.at("items").is_array()) {
     throw std::runtime_error("Items most be array type");
   }
@@ -57,15 +58,20 @@ std::vector<student_t> parse_file(const std::string &filepath) {
   if (j.at("items").size() != j.at("_meta").at("count")) {
     throw std::runtime_error("meta_: error with count");
   }
-
-  std::vector<student_t> result;
-  for (std::size_t i = 0; i < j.at("items").size(); i++) {
-    auto student = j.at("items")[i].get<student_t>();
-    result.push_back(student);
+  void push_student(std::vector<student_t> &result); {
+    std::vector<student_t> result;
+    for (std::size_t i = 0; i < j.at("items").size(); i++) {
+      student_t student;
+      student.name = get_Name(j.at("items")[i].at("name"));
+      student.group = get_group(j.at("items")[i].at("group"));
+      student.avg = get_avg(j.at("items")[i].at("avg"));
+      student.debt = get_debt(j.at("items")[i].at("debt"));
+      result.push_back(student);
+    }
+    return result;
   }
-  return result;
+  void push_student(std::vector<student_t> &result);
 }
-
 void print(const student_t &student, std::ostream &os) {
   os << "| " << std::left << std::setw(name_tablewidth) << student.name;
 
