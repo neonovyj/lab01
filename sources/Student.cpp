@@ -32,13 +32,17 @@ std::any get_debt(const json &j) {
   }
 }
 
-void from_json(const json &j, student_t &s) {
-  s.name = get_Name(j.at("name"));
-  s.group = get_group(j.at("group"));
-  s.avg = get_avg(j.at("avg"));
-  s.debt = get_debt(j.at("debt"));
-}
+void push_student(const json &j,std::vector<student_t> &result) {
+  for (std::size_t i = 0; i < j.size(); i++) {
+    student_t student;
+    student.name = get_Name(j[i].at("name"));
+    student.group = get_group(j[i].at("group"));
+    student.avg = get_avg(j[i].at("avg"));
+    student.debt = get_debt(j[i].at("debt"));
+    result.push_back(student);
+  }
 
+}
 std::vector<student_t> parse_file(const std::string &filepath) {
   std::fstream file;
   file.open(filepath, std::ios::in);
@@ -50,7 +54,6 @@ std::vector<student_t> parse_file(const std::string &filepath) {
   file >> j;
   file.close();
 
-
   if (!j.at("items").is_array()) {
     throw std::runtime_error("Items most be array type");
   }
@@ -58,20 +61,11 @@ std::vector<student_t> parse_file(const std::string &filepath) {
   if (j.at("items").size() != j.at("_meta").at("count")) {
     throw std::runtime_error("meta_: error with count");
   }
-  void push_student(std::vector<student_t> &result); {
-    std::vector<student_t> result;
-    for (std::size_t i = 0; i < j.at("items").size(); i++) {
-      student_t student;
-      student.name = get_Name(j.at("items")[i].at("name"));
-      student.group = get_group(j.at("items")[i].at("group"));
-      student.avg = get_avg(j.at("items")[i].at("avg"));
-      student.debt = get_debt(j.at("items")[i].at("debt"));
-      result.push_back(student);
-    }
-    return result;
-  }
-  void push_student(std::vector<student_t> &result);
+  std::vector<student_t> result;
+  push_student(j.at("items"), result);
+  return result;
 }
+
 void print(const student_t &student, std::ostream &os) {
   os << "| " << std::left << std::setw(name_tablewidth) << student.name;
 
