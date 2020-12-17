@@ -32,7 +32,7 @@ std::any get_debt(const json &j) {
   }
 }
 
-void push_student(const json &j,std::vector<student_t> &result) {
+void push_student(const json &j, std::vector<student_t> &result) {
   for (std::size_t i = 0; i < j.size(); i++) {
     student_t student;
     student.name = get_Name(j[i].at("name"));
@@ -41,7 +41,6 @@ void push_student(const json &j,std::vector<student_t> &result) {
     student.debt = get_debt(j[i].at("debt"));
     result.push_back(student);
   }
-
 }
 std::vector<student_t> parse_file(const std::string &filepath) {
   std::fstream file;
