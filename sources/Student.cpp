@@ -111,7 +111,6 @@ std::string do_line(const std::vector<int> &column_widths) {
   result += "|";
   return result;
 }
-
 void print(const std::vector<student_t> &students, std::ostream &os) {
   std::string line;
   std::vector<int> widths{name_tablewidth, group_tablewidth, avg_tablewidth,

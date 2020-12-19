@@ -1,5 +1,7 @@
 # Лабораторная работа № 1
-
+| branch | status |
+|--------|--------|
+| development |  [![CI](https://github.com/neonovyj/lab01/workflows/CI/badge.svg?branch=development)](https://github.com/neonovyj/lab01/actions/runs/428624172)
 ## Задание
 
 Реализовать утилиту табличного вывода массива данных, хранящихся в файле формата **JSON**.<br />
