@@ -1,7 +1,9 @@
 // Copyright 2020 ivan <ikhonyak@gmail.com>
 #include <Student.h>
 
-std::string get_Name(const json &j) { return j.get<std::string>(); }
+std::string get_Name(const json &j) {
+  return j.get<std::string>();
+}
 
 std::any get_group(const json &j) {
   if (j.is_string())
