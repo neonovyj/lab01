@@ -1,17 +1,15 @@
 // Copyright 2020 ivan <ikhonyak@gmail.com>
 #include <Student.h>
-
-std::string get_Name(const json &j) {
-  return j.get<std::string>();
+//тк мы не знаем, что представляет собой json поэтому передаем все в any с помощью get функций, которые позволяют получить доступ к полям в json
+std::string get_Name(const json &j) { //any- контейнер, в кот. хранятся любое значение, не заботясь о безопасности типов .
+  return j.get<std::string>(); //Name - всегда string, поэтому преобразовываем только в string
 }
-
-std::any get_group(const json &j) {
-  if (j.is_string())
-    return j.get<std::string>();
+std::any get_group(const json &j) {// any от auto отличается тем, что any можно переназначить
+  if (j.is_string()) //group может быть и string и int, поэтому get group проверяет, какой тип хранится в json
+    return j.get<std::string>(); //и исходя из этого записывает его в any
   else
     return j.get<int>();
 }
-
 std::any get_avg(const json &j) {
   if (j.is_null()) {
     return nullptr;
@@ -36,43 +34,43 @@ std::any get_debt(const json &j) {
 
 void push_student(const json &j, std::vector<student_t> &result) {
   for (std::size_t i = 0; i < j.size(); i++) {
-    student_t student;
-    student.name = get_Name(j[i].at("name"));
-    student.group = get_group(j[i].at("group"));
+    student_t student; //инициализация student, которого мы записываем в массив result
+    student.name = get_Name(j[i].at("name")); //at-оператор, служит для обращения по ключу, если значение ключа вне диапозона, то исключение
+    student.group = get_group(j[i].at("group")); //обращаемся к items и с помощью get возвращаем вектор студентов
     student.avg = get_avg(j[i].at("avg"));
     student.debt = get_debt(j[i].at("debt"));
-    result.push_back(student);
+    result.push_back(student); //добавление нового элемента в конец вектора
   }
 }
 std::vector<student_t> parse_file(const std::string &filepath) {
-  std::fstream file;
-  file.open(filepath, std::ios::in);
-  if (!file.is_open()) {
-    throw std::runtime_error(filepath + " unable to open json");
-  }
+  std::fstream file; //c помощью fstream происходит чтение данных их файла, файловый ввод
+  file.open(filepath, std::ios::in); //std::ios::in - флаг на то, что из этого файла идет чтение
+  if (!file.is_open()) { //проверяем,открыт ли файл !!! Требование проверки, есть ли аргумент, который указывае путь до файла
+    throw std::runtime_error(filepath + " unable to open json"); //если нет, выбрасываем исключение, программа остановится
+  } //Требование, существует ли файл
 
-  json j;
+  json j; //объявляем наш json файл?
   file >> j;
   file.close();
 
-  if (!j.at("items").is_array()) {
-    throw std::runtime_error("Items most be array type");
+  if (!j.at("items").is_array()) { //Требование, что все элементы образуют массив
+    throw std::runtime_error("Items most be array type"); // runtime_error - базовое исключение,которое бросается во время выполнения программы.
   }
 
-  if (j.at("items").size() != j.at("_meta").at("count")) {
+  if (j.at("items").size() != j.at("_meta").at("count")) { //Требование: сравниваем значение с ключом из meta
     throw std::runtime_error("meta_: error with count");
   }
   std::vector<student_t> result;
-  push_student(j.at("items"), result);
+  push_student(j.at("items"), result); //вызываем метод push_student
   return result;
 }
 
-void print(const student_t &student, std::ostream &os) {
-  os << "| " << std::left << std::setw(name_tablewidth) << student.name;
-
-  if (student.group.type() == typeid(int)) {
-    os << "| " << std::setw(group_tablewidth) << std::left
-       << std::any_cast<int>(student.group);
+void print(const student_t &student, std::ostream &os) { //ostream для записи в поток
+  os << "| " << std::left << std::setw(name_tablewidth) << student.name; // тут используются манипуляторы
+//Манипулятор — это объект, который применяется для изменения потока данных с использованием операторов извлечения (>>) или вставки (<<).
+  if (student.group.type() == typeid(int)) { //setw() - используется для ограничения количества символов, считываемых из потока.
+    os << "| " << std::setw(group_tablewidth) << std::left //выводимое поле выравниваем по левому краю
+       << std::any_cast<int>(student.group); //если поле не занимает ширину полностью, мы заполняем его пробелами
   } else {
     os << "| " << std::setw(group_tablewidth) << std::left
        << std::any_cast<std::string>(student.group);
